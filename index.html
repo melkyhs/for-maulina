@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>For Maulina Aprilia — 3D Peony, Lily &amp; Tulip Bouquet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #04050c;
+      font-family: "Montserrat", system-ui, -apple-system, sans-serif;
+      color: #f3f2f7;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    #sky-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 70% at 50% 42%, #111424 0%, #080a14 54%, #03040a 100%);
+    }
+
+    #sky-color-glow {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 62% at 50% 40%, rgba(58, 34, 60, 0.56) 0%, rgba(20, 15, 32, 0.44) 48%, rgba(4, 5, 12, 0) 100%);
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      cursor: grab;
+    }
+
+    #webgl-canvas:active {
+      cursor: grabbing;
+    }
+
+    .bottom-vignette {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 29vh;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(to top,
+          rgba(3, 4, 10, 0.88) 0%,
+          rgba(3, 4, 10, 0.50) 52%,
+          rgba(3, 4, 10, 0) 100%);
+    }
+
+    .caption-overlay {
+      position: fixed;
+      left: 50%;
+      bottom: 4.1vh;
+      transform: translateX(-50%);
+      width: min(92vw, 760px);
+      text-align: center;
+      z-index: 3;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.40rem;
+    }
+
+    .line-1 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.10rem, 2.3vw, 1.68rem);
+      letter-spacing: 0.03em;
+      color: rgba(236, 238, 246, 0.94);
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.88), 0 0 24px rgba(210, 218, 240, 0.18);
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .line-2 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(1.36rem, 2.95vw, 2.18rem);
+      letter-spacing: 0.045em;
+      background: linear-gradient(90deg, #ffb8d5 0%, #ffe6f1 48%, #ffffff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 20px rgba(255, 184, 213, 0.35));
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .dedication-wrap {
+      margin-top: 0.22rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.34rem;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .dedication-divider {
+      width: 96px;
+      height: 1px;
+      background: linear-gradient(90deg,
+          rgba(255, 210, 230, 0) 0%,
+          rgba(255, 206, 228, 0.72) 50%,
+          rgba(255, 210, 230, 0) 100%);
+    }
+
+    .dedication-text {
+      font-family: "Montserrat", system-ui, sans-serif;
+      font-weight: 400;
+      font-size: clamp(0.75rem, 1.3vw, 0.96rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffd9ea;
+      text-shadow:
+        0 2px 12px rgba(0, 0, 0, 0.92),
+        0 0 18px rgba(255, 192, 222, 0.42);
+    }
+
+    .dedication-sparkle {
+      color: #fff6fa;
+      margin: 0 0.45em;
+    }
+
+    .hint-pill {
+      position: fixed;
+      left: 1.4rem;
+      bottom: 1.35rem;
+      z-index: 4;
+      pointer-events: none;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(235, 236, 245, 0.56);
+      padding: 0.42rem 0.78rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(12, 14, 24, 0.45);
+      backdrop-filter: blur(8px);
+      transition: opacity 1s ease;
+    }
+
+    .replay-btn {
+      position: fixed;
+      right: 1.4rem;
+      bottom: 1.35rem;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      padding: 0.48rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 214, 232, 0.24);
+      background: rgba(18, 16, 28, 0.56);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #f8eaf2;
+      font-family: "Montserrat", system-ui, sans-serif;
+      font-size: 0.74rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.2s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .replay-btn:hover {
+      background: rgba(42, 30, 48, 0.75);
+      border-color: rgba(255, 198, 224, 0.55);
+      box-shadow: 0 0 18px rgba(255, 186, 218, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .replay-btn:active {
+      transform: translateY(0);
+    }
+
+    #fallback-banner {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      background: radial-gradient(circle at center, #141728 0%, #05060d 100%);
+      color: #f5e9f0;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.25rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+      .caption-overlay {
+        bottom: 5.2vh;
+        gap: 0.34rem;
+      }
+
+      .hint-pill {
+        left: 0.9rem;
+        bottom: 0.9rem;
+        font-size: 0.64rem;
+      }
+
+      .replay-btn {
+        right: 0.9rem;
+        bottom: 0.9rem;
+        padding: 0.42rem 0.8rem;
+        font-size: 0.68rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sky-backdrop"></div>
+  <div id="sky-color-glow"></div>
+  <canvas id="webgl-canvas"></canvas>
+  <div class="bottom-vignette"></div>
+
+  <div class="caption-overlay" aria-live="polite">
+    <p id="line1" class="line-1">My life was black and white before I met you.</p>
+    <p id="line2" class="line-2">You are the color.</p>
+    <div id="dedication" class="dedication-wrap">
+      <div class="dedication-divider"></div>
+      <p class="dedication-text">
+        <span class="dedication-sparkle">✦</span>For Maulina Aprilia<span class="dedication-sparkle">✦</span>
+      </p>
+    </div>
+  </div>
+
+  <div id="drag-hint" class="hint-pill">Drag to rotate</div>
+  <button id="replay-btn" class="replay-btn" type="button" title="Replay animation">
+    <span>↻</span>
+    <span>Replay</span>
+  </button>
+
+  <div id="fallback-banner">
+    <div>
+      <p>Unable to initialize 3D WebGL view or load Three.js.</p>
+      <p style="font-size: 0.95rem; opacity: 0.78; margin-top: 0.5rem;">
+        Please ensure an active internet connection for the initial library load and WebGL support in your browser.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    (function loadThreeAndBoot() {
+      const PRIMARY_URL = "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js";
+      const FALLBACK_URL = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+
+      function showFallback(msg) {
+        const banner = document.getElementById("fallback-banner");
+        if (banner) {
+          if (msg) {
+            const p = banner.querySelector("p");
+            if (p) p.textContent = msg;
+          }
+          banner.style.display = "flex";
+        }
+      }
+
+      function injectScript(src, onLoad, onError) {
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = false;
+        s.onload = onLoad;
+        s.onerror = onError;
+        document.head.appendChild(s);
+      }
+
+      injectScript(
+        PRIMARY_URL,
+        function () {
+          if (typeof THREE !== "undefined") {
+            startBouquetExperience();
+          } else {
+            showFallback();
+          }
+        },
+        function () {
+          injectScript(
+            FALLBACK_URL,
+            function () {
+              if (typeof THREE !== "undefined") {
+                startBouquetExperience();
+              } else {
+                showFallback();
+              }
+            },
+            function () {
+              showFallback();
+            }
+          );
+        }
+      );
+
+      function startBouquetExperience() {
+        "use strict";
+
+        // -------------------------------------------------------------------
+        // Seeded PRNG & Math Helpers
+        // -------------------------------------------------------------------
+        function mulberry32(seed) {
+          let a = seed >>> 0;
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        function clamp(v, lo, hi) {
+          return v < lo ? lo : v > hi ? hi : v;
+        }
+
+        function smoothstep(e0, e1, x) {
+          if (e1 <= e0) return x >= e1 ? 1 : 0;
+          const t = clamp((x - e0) / (e1 - e0), 0, 1);
+          return t * t * (3 - 2 * t);
+        }
+
+        function srgbColor(hex) {
+          return new THREE.Color(hex).convertSRGBToLinear();
+        }
+
+        // -------------------------------------------------------------------
+        // Strict Zero-Red Color Palette (Baby Pink + Pearl White + Sage Green)
+        // -------------------------------------------------------------------
+        const PALETTE = {
+          peonyShadow: srgbColor("#C86898"),
+          peonyBaby: srgbColor("#FF9EC8"),
+          peonyTip: srgbColor("#FFE0EE"),
+
+          peonyCreamBase: srgbColor("#EA9EC0"),
+          peonyCreamMid: srgbColor("#FFD0E4"),
+          peonyCreamTip: srgbColor("#FFF5F9"),
+
+          lilyMidrib: srgbColor("#EC6FA9"),
+          lilySpeckle: srgbColor("#C95896"),
+          lilyEdge: srgbColor("#FFFFFF"),
+          lilyThroat: srgbColor("#AEE092"),
+          lilyAnther: srgbColor("#E8A8C6"),
+
+          tulipBase: srgbColor("#C5E0B8"),
+          tulipMid: srgbColor("#FFF5F9"),
+          tulipTip: srgbColor("#FFFFFF"),
+
+          fillerPink: srgbColor("#F7A6CC"),
+          fillerWhite: srgbColor("#FFF7FB"),
+
+          sageBase: srgbColor("#346348"),
+          sageMid: srgbColor("#649E7A"),
+          sageTip: srgbColor("#A5D6B7"),
+
+          stemBase: srgbColor("#3F7054"),
+          stemTip: srgbColor("#6AA380"),
+
+          wrapDark: srgbColor("#4E7D63"),
+          wrapMid: srgbColor("#78AB8E"),
+          wrapLight: srgbColor("#B2D8C1"),
+          tissueWhite: srgbColor("#FFF9FC"),
+
+          ribbonLow: srgbColor("#E588B4"),
+          ribbonHigh: srgbColor("#FFC2DF"),
+          ribbonPearl: srgbColor("#FFF2F8"),
+        };
+
+        // -------------------------------------------------------------------
+        // Renderer, Scene, Camera Setup
+        // -------------------------------------------------------------------
+        const canvas = document.getElementById("webgl-canvas");
+        let renderer;
+        try {
+          renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+          });
+        } catch (err) {
+          showFallback("WebGL is unavailable in this browser.");
+          return;
+        }
+
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.96;
+
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(
+          40,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          120
+        );
+
+        // -------------------------------------------------------------------
+        // Romantic Three-Point Lighting
+        // -------------------------------------------------------------------
+        const hemiLight = new THREE.HemisphereLight(0xf3f6ff, 0x2a2438, 0.58);
+        scene.add(hemiLight);
+
+        const keyLight = new THREE.DirectionalLight(0xfff9fc, 0.94);
+        keyLight.position.set(4.8, 7.2, 5.8);
+        scene.add(keyLight);
+
+        const rimLight = new THREE.DirectionalLight(0xdce8ff, 0.50);
+        rimLight.position.set(-5.8, 3.8, -4.5);
+        scene.add(rimLight);
+
+        const fillLight = new THREE.DirectionalLight(0xffedf5, 0.26);
+        fillLight.position.set(0.4, -1.0, 6.4);
+        scene.add(fillLight);
+
+        // -------------------------------------------------------------------
+        // Custom 3D Spatial Black-and-White -> Color Bloom Shader Hook
+        // -------------------------------------------------------------------
+        const bloomUniforms = {
+          uBloomFront: { value: -0.4 },
+          uCrestGlow: { value: 1.0 },
+        };
+
+        function attachBloomShader(material) {
+          material.customProgramCacheKey = function () {
+            return "peony-bloom-v1";
+          };
+          material.onBeforeCompile = function (shader) {
+            shader.uniforms.uBloomFront = bloomUniforms.uBloomFront;
+            shader.uniforms.uCrestGlow = bloomUniforms.uCrestGlow;
+
+            shader.vertexShader = shader.vertexShader
+              .replace(
+                "#include <common>",
+                "#include <common>\nattribute float aWavePos;\nvarying float vWavePos;"
+              )
+              .replace(
+                "#include <begin_vertex>",
+                "#include <begin_vertex>\nvWavePos = aWavePos;"
+              );
+
+            shader.fragmentShader = shader.fragmentShader
+              .replace(
+                "#include <common>",
+                "#include <common>\nuniform float uBloomFront;\nuniform float uCrestGlow;\nvarying float vWavePos;"
+              )
+              .replace(
+                "#include <tonemapping_fragment>",
+                `
+                {
+                  float luma = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+                  float filmLuma = mix(luma, smoothstep(0.02, 0.96, luma), 0.28);
+                  vec3 bw = vec3(filmLuma * 0.96, filmLuma * 0.98, filmLuma * 1.03);
+                  float cMix = smoothstep(vWavePos - 0.30, vWavePos + 0.08, uBloomFront);
+                  float crest = smoothstep(0.0, 0.48, cMix) * (1.0 - smoothstep(0.48, 1.0, cMix));
+                  vec3 crestGlow = vec3(0.24, 0.16, 0.21) * crest * uCrestGlow;
+                  vec3 colored = gl_FragColor.rgb;
+                  float colLuma = dot(colored, vec3(0.299, 0.587, 0.114));
+                  colored = max(vec3(0.0), mix(vec3(colLuma), colored, 1.18));
+                  gl_FragColor.rgb = mix(bw, colored, cMix) + crestGlow;
+                }
+                #include <tonemapping_fragment>
+                `
+              );
+          };
+          return material;
+        }
+
+        // -------------------------------------------------------------------
+        // Procedural Textures (Oriental Lily Petal & Arched Florist Card)
+        // -------------------------------------------------------------------
+        function createLilyPetalTexture() {
+          const w = 256;
+          const h = 512;
+          const c = document.createElement("canvas");
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext("2d");
+
+          // Base crisp pearl white
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, w, h);
+
+          // Rich sweet baby-pink midrib glow fading toward edges & tip
+          const midGrad = ctx.createLinearGradient(0, 0, w, 0);
+          midGrad.addColorStop(0.0, "rgba(255, 255, 255, 0)");
+          midGrad.addColorStop(0.24, "rgba(255, 166, 208, 0.58)");
+          midGrad.addColorStop(0.50, "rgba(236, 111, 169, 0.94)");
+          midGrad.addColorStop(0.76, "rgba(255, 166, 208, 0.58)");
+          midGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+          ctx.fillStyle = midGrad;
+          ctx.fillRect(0, h * 0.08, w, h * 0.84);
+
+          // Fade tip smoothly back to crisp white
+          const tipFade = ctx.createLinearGradient(0, 0, 0, h * 0.28);
+          tipFade.addColorStop(0.0, "rgba(255, 255, 255, 0.96)");
+          tipFade.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+          ctx.fillStyle = tipFade;
+          ctx.fillRect(0, 0, w, h * 0.28);
+
+          // Fresh pale sage-lime throat at petal base (bottom of UV)
+          const throatGrad = ctx.createRadialGradient(w * 0.5, h * 0.98, 6, w * 0.5, h * 0.96, h * 0.24);
+          throatGrad.addColorStop(0.0, "rgba(174, 224, 146, 0.98)");
+          throatGrad.addColorStop(0.55, "rgba(202, 234, 186, 0.70)");
+          throatGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+          ctx.fillStyle = throatGrad;
+          ctx.fillRect(0, h * 0.65, w, h * 0.35);
+
+          // Characteristic Oriental Lily rose-pink speckles along inner midrib
+          const dotRng = mulberry32(73109);
+          for (let i = 0; i < 62; i++) {
+            const u = 0.22 + dotRng() * 0.56; // vertical along lower-mid petal
+            const spread = (dotRng() - 0.5) * 0.38 * (1.0 - Math.abs(u - 0.5));
+            const px = w * (0.5 + spread);
+            const py = h * (1.0 - u);
+            const rx = 2.0 + dotRng() * 2.5;
+            const ry = rx * (1.2 + dotRng() * 0.6);
+            ctx.fillStyle = `rgba(201, 88, 150, ${(0.55 + dotRng() * 0.37).toFixed(2)})`;
+            ctx.beginPath();
+            ctx.ellipse(px, py, rx, ry, (dotRng() - 0.5) * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.needsUpdate = true;
+          return tex;
+        }
+
+        function createFloristCardTexture() {
+          const w = 256;
+          const h = 384;
+          const c = document.createElement("canvas");
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext("2d");
+
+          // Creamy blush pearl cardstock
+          const bg = ctx.createLinearGradient(0, 0, 0, h);
+          bg.addColorStop(0, "#FFF9FC");
+          bg.addColorStop(0.55, "#FDF3F7");
+          bg.addColorStop(1, "#F8E8F0");
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, w, h);
+
+          // Thin sage-green arched border following card contour
+          ctx.strokeStyle = "#6F9B80";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          const pad = 16;
+          const archR = (w - pad * 2) * 0.5;
+          const archY = pad + archR;
+          ctx.arc(w / 2, archY, archR, Math.PI, 0, false);
+          ctx.lineTo(w - pad, h - pad);
+          ctx.lineTo(pad, h - pad);
+          ctx.closePath();
+          ctx.stroke();
+
+          ctx.strokeStyle = "rgba(133, 182, 152, 0.55)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          const pad2 = 24;
+          const archR2 = (w - pad2 * 2) * 0.5;
+          ctx.arc(w / 2, archY + 2, archR2, Math.PI, 0, false);
+          ctx.lineTo(w - pad2, h - pad2);
+          ctx.lineTo(pad2, h - pad2);
+          ctx.closePath();
+          ctx.stroke();
+
+          // Tiny pastel pink & sage floral corner accents
+          const drawTinyPetal = (cx, cy, r, ang, col) => {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(ang);
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r, r * 0.55, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          };
+          drawTinyPetal(w * 0.25, h * 0.24, 9, -0.5, "rgba(246, 184, 212, 0.72)");
+          drawTinyPetal(w * 0.75, h * 0.24, 9, 0.5, "rgba(246, 184, 212, 0.72)");
+          drawTinyPetal(w * 0.20, h * 0.28, 7, 0.4, "rgba(133, 182, 152, 0.65)");
+          drawTinyPetal(w * 0.80, h * 0.28, 7, -0.4, "rgba(133, 182, 152, 0.65)");
+
+          // Tiny botanical emblem at top of arch
+          ctx.fillStyle = "#85B698";
+          ctx.beginPath();
+          ctx.arc(w / 2, 54, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Elegant dedication text
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#6F9B80";
+          ctx.font = "italic 500 22px Georgia, serif";
+          ctx.fillText("Especially For", w / 2, 146);
+
+          ctx.fillStyle = "#485E52";
+          ctx.font = "600 26px Georgia, serif";
+          ctx.fillText("Maulina", w / 2, 192);
+          ctx.fillText("Aprilia", w / 2, 224);
+
+          // Delicate flourish under name
+          ctx.strokeStyle = "rgba(232, 160, 196, 0.85)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(w * 0.30, 250);
+          ctx.lineTo(w * 0.70, 250);
+          ctx.stroke();
+
+          ctx.fillStyle = "#9C8496";
+          ctx.font = "italic 16px Georgia, serif";
+          ctx.fillText("with love", w / 2, 284);
+
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.needsUpdate = true;
+          return tex;
+        }
+
+        const lilyTexture = createLilyPetalTexture();
+        const cardTexture = createFloristCardTexture();
+
+        const petalMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.56,
+            metalness: 0.02,
+            emissive: srgbColor("#3D142A"),
+            emissiveIntensity: 0.16,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const lilyPetalMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            map: lilyTexture,
+            roughness: 0.50,
+            metalness: 0.02,
+            emissive: srgbColor("#3D142A"),
+            emissiveIntensity: 0.16,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const foliageMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.62,
+            metalness: 0.02,
+            emissive: srgbColor("#0C1E14"),
+            emissiveIntensity: 0.14,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const wrapMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.80,
+            metalness: 0.01,
+            emissive: srgbColor("#0D1D14"),
+            emissiveIntensity: 0.14,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const ribbonMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.34,
+            metalness: 0.08,
+            emissive: srgbColor("#3A1428"),
+            emissiveIntensity: 0.18,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const cardFrontMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            map: cardTexture,
+            roughness: 0.72,
+            metalness: 0.02,
+            emissive: srgbColor("#1C1A20"),
+            emissiveIntensity: 0.14,
+            side: THREE.FrontSide,
+          })
+        );
+
+        const cardBackMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.74,
+            metalness: 0.01,
+            emissive: srgbColor("#1C1A20"),
+            emissiveIntensity: 0.14,
+            side: THREE.DoubleSide,
+          })
+        );
+
+        const floatingPetalMaterial = attachBloomShader(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.52,
+            metalness: 0.02,
+            emissive: srgbColor("#421830"),
+            emissiveIntensity: 0.26,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.0,
+            depthWrite: false,
+          })
+        );
+
+        // -------------------------------------------------------------------
+        // Common Geometry Utilities
+        // -------------------------------------------------------------------
+        function setLinearGradientColors(geometry, cLow, cMid, cHigh, factorFn) {
+          const pos = geometry.attributes.position;
+          const count = pos.count;
+          const cols = new Float32Array(count * 3);
+          const tmp = new THREE.Color();
+          for (let i = 0; i < count; i++) {
+            const t = clamp(factorFn(pos, i), 0, 1);
+            if (t < 0.52) {
+              tmp.copy(cLow).lerp(cMid, t / 0.52);
+            } else {
+              tmp.copy(cMid).lerp(cHigh, (t - 0.52) / 0.48);
+            }
+            cols[i * 3] = tmp.r;
+            cols[i * 3 + 1] = tmp.g;
+            cols[i * 3 + 2] = tmp.b;
+          }
+          geometry.setAttribute("color", new THREE.BufferAttribute(cols, 3));
+        }
+
+        function createPetalGeometry(opts) {
+          const uSeg = opts.uSeg || 12;
+          const vSeg = opts.vSeg || 10;
+          const length = opts.length;
+          const width = opts.width;
+          const tiltRad = opts.tiltRad;
+          const cupDepth = opts.cupDepth;
+          const ruffleAmp = opts.ruffleAmp;
+          const ruffleFreq = opts.ruffleFreq;
+          const rufflePhase = opts.rufflePhase;
+          const lipCurl = opts.lipCurl;
+          const baseRadius = opts.baseRadius;
+          const cBase = opts.cBase;
+          const cMid = opts.cMid;
+          const cTip = opts.cTip;
+
+          const vertCount = (uSeg + 1) * (vSeg + 1);
+          const positions = new Float32Array(vertCount * 3);
+          const colors = new Float32Array(vertCount * 3);
+          const indices = [];
+
+          const sTilt = Math.sin(tiltRad);
+          const cTilt = Math.cos(tiltRad);
+          const tmpCol = new THREE.Color();
+
+          let ptr = 0;
+          for (let iu = 0; iu <= uSeg; iu++) {
+            const u = iu / uSeg;
+            const widthProfile = u > 0 ? Math.sin(Math.pow(u, 0.72) * Math.PI) : 0;
+            const edgeNotch = 1.0 - 0.05 * Math.pow(u, 3.0);
+
+            for (let iv = 0; iv <= vSeg; iv++) {
+              const v = -1.0 + 2.0 * (iv / vSeg);
+              const x = v * 0.5 * width * widthProfile;
+
+              const rDist = u * length * (edgeNotch + 0.03 * Math.cos(v * Math.PI * 2.0) * u);
+              const arch = Math.sin(u * Math.PI * 0.82) * cupDepth * 0.46;
+              const transverseCup =
+                (1.0 - v * v) * cupDepth * (0.28 + 0.72 * Math.sin(u * Math.PI));
+              const lip = Math.pow(u, 2.4) * lipCurl;
+              const ruffle =
+                Math.sin(v * Math.PI * ruffleFreq + rufflePhase) *
+                ruffleAmp *
+                Math.pow(u, 1.55);
+
+              // Positive transverseCup * cTilt creates true inward bowl cupping
+              const radial =
+                baseRadius + rDist * sTilt + transverseCup * cTilt - arch * cTilt * 0.35 + lip;
+              const height =
+                rDist * cTilt + transverseCup * sTilt * 0.35 + ruffle - lip * 0.42;
+
+              positions[ptr * 3] = x;
+              positions[ptr * 3 + 1] = height;
+              positions[ptr * 3 + 2] = radial;
+
+              const tCol = clamp(u * 0.88 + Math.abs(v) * 0.12 * u, 0, 1);
+              if (tCol < 0.48) {
+                tmpCol.copy(cBase).lerp(cMid, tCol / 0.48);
+              } else {
+                tmpCol.copy(cMid).lerp(cTip, (tCol - 0.48) / 0.52);
+              }
+              colors[ptr * 3] = tmpCol.r;
+              colors[ptr * 3 + 1] = tmpCol.g;
+              colors[ptr * 3 + 2] = tmpCol.b;
+              ptr++;
+            }
+          }
+
+          for (let iu = 0; iu < uSeg; iu++) {
+            for (let iv = 0; iv < vSeg; iv++) {
+              const a = iu * (vSeg + 1) + iv;
+              const b = a + 1;
+              const c = a + (vSeg + 1);
+              const d = c + 1;
+              indices.push(a, c, b);
+              indices.push(b, c, d);
+            }
+          }
+
+          const geom = new THREE.BufferGeometry();
+          geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          geom.setIndex(indices);
+          geom.computeVertexNormals();
+          return geom;
+        }
+
+        // -------------------------------------------------------------------
+        // Flower Builder 1: Plump Globular Cupped Peony (createGlobularPeony)
+        // -------------------------------------------------------------------
+        function createGlobularPeony(style, scale, rng) {
+          const headGroup = new THREE.Group();
+          const isCream = style === "cream_blush";
+
+          // Tight globular bowl-cupped peony: petals hug inward to form a pillowy sphere
+          const ringSpecs = [
+            // [count, tiltDeg, len, width, baseR, cup, ruffle, lipCurl]
+            [6, 14, 0.24, 0.24, 0.020, 0.10, 0.016, -0.05],
+            [8, 25, 0.34, 0.34, 0.042, 0.14, 0.024, -0.04],
+            [9, 36, 0.44, 0.44, 0.068, 0.16, 0.032, -0.03],
+            [11, 47, 0.50, 0.52, 0.095, 0.17, 0.036, -0.01],
+            [12, 58, 0.54, 0.56, 0.120, 0.16, 0.034, 0.02],
+            [10, 68, 0.50, 0.52, 0.135, 0.14, 0.026, 0.04],
+          ];
+
+          const cBase = isCream ? PALETTE.peonyCreamBase : PALETTE.peonyShadow;
+          const cMid = isCream ? PALETTE.peonyCreamMid : PALETTE.peonyBaby;
+          const cTip = isCream ? PALETTE.peonyCreamTip : PALETTE.peonyTip;
+
+          for (let rIdx = 0; rIdx < ringSpecs.length; rIdx++) {
+            const spec = ringSpecs[rIdx];
+            const count = spec[0];
+            const tiltBase = THREE.MathUtils.degToRad(spec[1]);
+            const pLen = spec[2];
+            const pWid = spec[3];
+            const baseR = spec[4];
+            const cup = spec[5];
+            const ruffle = spec[6];
+            const lip = spec[7];
+
+            const ringPhase = rng() * Math.PI * 2;
+            for (let i = 0; i < count; i++) {
+              const azimuth =
+                (i / count) * Math.PI * 2 + ringPhase + (rng() - 0.5) * 0.16;
+              const geom = createPetalGeometry({
+                uSeg: 12,
+                vSeg: 10,
+                length: pLen * (0.94 + rng() * 0.12),
+                width: pWid * (0.94 + rng() * 0.12),
+                tiltRad: tiltBase + (rng() - 0.5) * 0.07,
+                cupDepth: cup * (0.92 + rng() * 0.16),
+                ruffleAmp: ruffle * (0.85 + rng() * 0.3),
+                ruffleFreq: 2.5 + rng() * 0.8,
+                rufflePhase: rng() * Math.PI * 2,
+                lipCurl: lip,
+                baseRadius: baseR,
+                cBase: cBase,
+                cMid: cMid,
+                cTip: cTip,
+              });
+
+              const petalMesh = new THREE.Mesh(geom, petalMaterial);
+              petalMesh.rotation.y = azimuth;
+              petalMesh.rotation.z = (rng() - 0.5) * 0.05;
+              headGroup.add(petalMesh);
+            }
+          }
+
+          // Subtle sage calyx underneath
+          for (let s = 0; s < 5; s++) {
+            const az = (s / 5) * Math.PI * 2 + rng() * 0.2;
+            const sepalGeom = createPetalGeometry({
+              uSeg: 7,
+              vSeg: 5,
+              length: 0.28,
+              width: 0.17,
+              tiltRad: THREE.MathUtils.degToRad(102),
+              cupDepth: 0.03,
+              ruffleAmp: 0.006,
+              ruffleFreq: 1.5,
+              rufflePhase: 0,
+              lipCurl: 0.05,
+              baseRadius: 0.05,
+              cBase: PALETTE.sageBase,
+              cMid: PALETTE.sageMid,
+              cTip: PALETTE.sageTip,
+            });
+            const sepal = new THREE.Mesh(sepalGeom, foliageMaterial);
+            sepal.position.y = -0.02;
+            sepal.rotation.y = az;
+            headGroup.add(sepal);
+          }
+
+          headGroup.scale.setScalar(scale);
+          return headGroup;
+        }
+
+        // -------------------------------------------------------------------
+        // Flower Builder 2: Star-Shaped Oriental Lily (createOrientalLily)
+        //                   + Closed Lily Buds (createLilyBud)
+        // -------------------------------------------------------------------
+        function createLilyPetalGeometry(length, maxWidth, flareTiltRad, recurveAmt, rufflePhase) {
+          const uSeg = 16;
+          const vSeg = 10;
+          const vertCount = (uSeg + 1) * (vSeg + 1);
+          const positions = new Float32Array(vertCount * 3);
+          const uvs = new Float32Array(vertCount * 2);
+          const indices = [];
+
+          let ptr = 0;
+          for (let iu = 0; iu <= uSeg; iu++) {
+            const u = iu / uSeg;
+            // Lanceolate pointed lily petal silhouette (narrow base, full belly at u=0.45, pointed tip at u=1)
+            const widthProfile = Math.sin(Math.pow(u, 0.75) * Math.PI) * (1.0 - 0.24 * Math.pow(u, 2.2));
+            // Graceful trumpet flare and recurving backward tip
+            const curveAngle = flareTiltRad * (0.28 + 0.92 * Math.pow(u, 0.85)) + Math.pow(u, 2.2) * recurveAmt;
+            const s = u * length;
+            const rBase = Math.sin(curveAngle) * s;
+            const yBase = Math.cos(curveAngle) * s;
+
+            for (let iv = 0; iv <= vSeg; iv++) {
+              const v = -1.0 + 2.0 * (iv / vSeg);
+              const x = v * 0.5 * maxWidth * widthProfile;
+
+              // Gently raised central midrib ridge + wavy crinkled petal edges
+              const midribCrease = (1.0 - Math.abs(v)) * 0.028 * length * Math.sin(u * Math.PI);
+              const edgeWave =
+                Math.sin(u * Math.PI * 3.4 + rufflePhase) *
+                0.022 *
+                length *
+                Math.pow(Math.abs(v), 1.4) *
+                Math.sin(u * Math.PI);
+
+              // Offset perpendicular to petal spine (approx outward/upward normal direction)
+              const radial = rBase + midribCrease * Math.cos(curveAngle);
+              const height = yBase - midribCrease * Math.sin(curveAngle) + edgeWave;
+
+              positions[ptr * 3] = x;
+              positions[ptr * 3 + 1] = height;
+              positions[ptr * 3 + 2] = radial;
+
+              uvs[ptr * 2] = 0.5 + v * 0.5;
+              uvs[ptr * 2 + 1] = u; // u=0 base (throat), u=1 tip
+              ptr++;
+            }
+          }
+
+          for (let iu = 0; iu < uSeg; iu++) {
+            for (let iv = 0; iv < vSeg; iv++) {
+              const a = iu * (vSeg + 1) + iv;
+              const b = a + 1;
+              const c = a + (vSeg + 1);
+              const d = c + 1;
+              indices.push(a, c, b);
+              indices.push(b, c, d);
+            }
+          }
+
+          const geom = new THREE.BufferGeometry();
+          geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geom.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+          geom.setIndex(indices);
+          geom.computeVertexNormals();
+          return geom;
+        }
+
+        function createOrientalLily(scale, rng) {
+          const lilyGroup = new THREE.Group();
+
+          // 3 inner petals + 3 outer sepals alternating every 60 degrees
+          for (let i = 0; i < 6; i++) {
+            const isInner = i % 2 === 0;
+            const azimuth = (i / 6) * Math.PI * 2 + (rng() - 0.5) * 0.06;
+            const geom = createLilyPetalGeometry(
+              isInner ? 0.72 : 0.70,
+              isInner ? 0.30 : 0.25,
+              THREE.MathUtils.degToRad(isInner ? 66 : 72),
+              isInner ? 0.56 : 0.64,
+              rng() * Math.PI * 2
+            );
+            const petal = new THREE.Mesh(geom, lilyPetalMaterial);
+            petal.rotation.y = azimuth;
+            lilyGroup.add(petal);
+          }
+
+          // 6 arching slender pale-sage filaments + pastel champagne-rose oblong anthers
+          for (let i = 0; i < 6; i++) {
+            const az = (i / 6) * Math.PI * 2 + 0.28;
+            const curve = new THREE.CatmullRomCurve3([
+              new THREE.Vector3(0, 0.02, 0),
+              new THREE.Vector3(Math.sin(az) * 0.09, 0.22, Math.cos(az) * 0.09),
+              new THREE.Vector3(Math.sin(az) * 0.21, 0.34, Math.cos(az) * 0.21),
+            ]);
+            const filGeom = new THREE.TubeGeometry(curve, 10, 0.0085, 5, false);
+            setLinearGradientColors(filGeom, PALETTE.lilyThroat, PALETTE.lilyEdge, PALETTE.lilyEdge, (pos, idx) =>
+              clamp(pos.getY(idx) / 0.34, 0, 1)
+            );
+            lilyGroup.add(new THREE.Mesh(filGeom, foliageMaterial));
+
+            const antherGeom = new THREE.SphereGeometry(0.026, 8, 6);
+            antherGeom.scale(0.55, 1.55, 0.55);
+            setLinearGradientColors(antherGeom, PALETTE.lilyAnther, PALETTE.lilyAnther, PALETTE.lilyMidrib, () => 0.5);
+            const anther = new THREE.Mesh(antherGeom, petalMaterial);
+            anther.position.set(Math.sin(az) * 0.21, 0.34, Math.cos(az) * 0.21);
+            anther.rotation.set(Math.cos(az) * 0.7, 0, -Math.sin(az) * 0.7);
+            lilyGroup.add(anther);
+          }
+
+          // Central slender pale-sage pistil
+          const pistilGeom = new THREE.CylinderGeometry(0.011, 0.014, 0.38, 6);
+          setLinearGradientColors(pistilGeom, PALETTE.lilyThroat, PALETTE.lilyThroat, PALETTE.sageTip, () => 0.5);
+          const pistil = new THREE.Mesh(pistilGeom, foliageMaterial);
+          pistil.position.y = 0.19;
+          lilyGroup.add(pistil);
+
+          const stigmaGeom = new THREE.SphereGeometry(0.024, 8, 6);
+          setLinearGradientColors(stigmaGeom, PALETTE.sageMid, PALETTE.sageTip, PALETTE.lilyThroat, () => 0.5);
+          const stigma = new THREE.Mesh(stigmaGeom, foliageMaterial);
+          stigma.position.y = 0.39;
+          lilyGroup.add(stigma);
+
+          lilyGroup.scale.setScalar(scale);
+          return lilyGroup;
+        }
+
+        function createLilyBud(scale) {
+          const budGroup = new THREE.Group();
+          const budGeom = new THREE.SphereGeometry(0.11, 14, 12);
+          budGeom.scale(0.85, 2.75, 0.85);
+          setLinearGradientColors(
+            budGeom,
+            PALETTE.sageMid,
+            PALETTE.lilyThroat,
+            PALETTE.lilyMidrib,
+            (pos, idx) => clamp((pos.getY(idx) + 0.28) / 0.58, 0, 1)
+          );
+          const budMesh = new THREE.Mesh(budGeom, petalMaterial);
+          budMesh.position.y = 0.26;
+          budGroup.add(budMesh);
+          budGroup.scale.setScalar(scale);
+          return budGroup;
+        }
+
+        // -------------------------------------------------------------------
+        // Flower Builder 3: Sleek Creamy-White Tulip (createTulip)
+        // -------------------------------------------------------------------
+        function createTulip(scale, rng) {
+          const tulipGroup = new THREE.Group();
+
+          // 3 inner + 3 outer deeply concave smooth egg-shaped petals
+          for (let i = 0; i < 6; i++) {
+            const isInner = i % 2 === 0;
+            const azimuth = (i / 6) * Math.PI * 2 + (isInner ? 0 : 0.12);
+            const geom = createPetalGeometry({
+              uSeg: 12,
+              vSeg: 10,
+              length: isInner ? 0.42 : 0.44,
+              width: isInner ? 0.30 : 0.32,
+              tiltRad: THREE.MathUtils.degToRad(isInner ? 18 : 25),
+              cupDepth: 0.145,
+              ruffleAmp: 0.004,
+              ruffleFreq: 1.5,
+              rufflePhase: rng() * Math.PI,
+              lipCurl: -0.075, // curve cleanly inward at tip to form tulip goblet
+              baseRadius: isInner ? 0.032 : 0.048,
+              cBase: PALETTE.tulipBase,
+              cMid: PALETTE.tulipMid,
+              cTip: PALETTE.tulipTip,
+            });
+            const petal = new THREE.Mesh(geom, petalMaterial);
+            petal.rotation.y = azimuth;
+            tulipGroup.add(petal);
+          }
+
+          tulipGroup.scale.setScalar(scale);
+          return tulipGroup;
+        }
+
+        // -------------------------------------------------------------------
+        // Filler Clusters (Stock / Lilac / Baby's Breath Sprigs) & Leaves
+        // -------------------------------------------------------------------
+        const fillerUnitGeom = new THREE.SphereGeometry(0.040, 7, 6);
+        function createFillerCluster(rng, isSpire) {
+          const group = new THREE.Group();
+          const count = isSpire ? 18 : 14;
+          for (let i = 0; i < count; i++) {
+            const t = i / Math.max(1, count - 1);
+            const geom = fillerUnitGeom.clone();
+            const isWhite = i % 2 === 0;
+            setLinearGradientColors(
+              geom,
+              isWhite ? PALETTE.peonyCreamMid : PALETTE.fillerPink,
+              isWhite ? PALETTE.fillerWhite : PALETTE.peonyBaby,
+              PALETTE.peonyCreamTip,
+              () => 0.6
+            );
+            const dot = new THREE.Mesh(geom, petalMaterial);
+            if (isSpire) {
+              const ang = i * 2.1;
+              const rad = (1.0 - t * 0.55) * 0.11;
+              dot.position.set(Math.cos(ang) * rad, t * 0.42, Math.sin(ang) * rad);
+              dot.scale.setScalar(0.75 + (1.0 - t) * 0.55);
+            } else {
+              dot.position.set(
+                (rng() - 0.5) * 0.24,
+                (rng() - 0.5) * 0.20,
+                (rng() - 0.5) * 0.24
+              );
+              dot.scale.setScalar(0.65 + rng() * 0.6);
+            }
+            group.add(dot);
+          }
+          return group;
+        }
+
+        function createLeafMesh(length, width, archDrop) {
+          const uSeg = 12;
+          const vSeg = 8;
+          const vertCount = (uSeg + 1) * (vSeg + 1);
+          const positions = new Float32Array(vertCount * 3);
+          const colors = new Float32Array(vertCount * 3);
+          const indices = [];
+          const tmpCol = new THREE.Color();
+
+          let ptr = 0;
+          for (let iu = 0; iu <= uSeg; iu++) {
+            const u = iu / uSeg;
+            const profile = Math.sin(Math.pow(u, 0.70) * Math.PI) * (1.0 - 0.18 * u);
+            for (let iv = 0; iv <= vSeg; iv++) {
+              const v = -1.0 + 2.0 * (iv / vSeg);
+              const x = v * 0.5 * width * profile;
+              const z = u * length;
+              const vFold = Math.abs(v) * 0.055 * length * profile;
+              const arch = Math.sin(u * Math.PI * 0.65) * 0.07 - Math.pow(u, 1.85) * archDrop;
+              const y = vFold + arch;
+
+              positions[ptr * 3] = x;
+              positions[ptr * 3 + 1] = y;
+              positions[ptr * 3 + 2] = z;
+
+              const tCol = clamp(u * 0.8 + Math.abs(v) * 0.2, 0, 1);
+              if (tCol < 0.5) {
+                tmpCol.copy(PALETTE.sageBase).lerp(PALETTE.sageMid, tCol / 0.5);
+              } else {
+                tmpCol.copy(PALETTE.sageMid).lerp(PALETTE.sageTip, (tCol - 0.5) / 0.5);
+              }
+              colors[ptr * 3] = tmpCol.r;
+              colors[ptr * 3 + 1] = tmpCol.g;
+              colors[ptr * 3 + 2] = tmpCol.b;
+              ptr++;
+            }
+          }
+
+          for (let iu = 0; iu < uSeg; iu++) {
+            for (let iv = 0; iv < vSeg; iv++) {
+              const a = iu * (vSeg + 1) + iv;
+              const b = a + 1;
+              const c = a + (vSeg + 1);
+              const d = c + 1;
+              indices.push(a, c, b);
+              indices.push(b, c, d);
+            }
+          }
+
+          const geom = new THREE.BufferGeometry();
+          geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          geom.setIndex(indices);
+          geom.computeVertexNormals();
+          return new THREE.Mesh(geom, foliageMaterial);
+        }
+
+        // -------------------------------------------------------------------
+        // Korean Multi-Layered Wrapping Paper + Ribbon Skirt (createBouquetWrap)
+        // -------------------------------------------------------------------
+        function createWrapSheetGeometry(opts) {
+          const uSeg = opts.uSeg || 18;
+          const vSeg = opts.vSeg || 14;
+          const height = opts.height;
+          const bottomR = opts.bottomR;
+          const topR = opts.topR;
+          const arcAngle = opts.arcAngle;
+          const flareOut = opts.flareOut;
+          const waveAmp = opts.waveAmp !== undefined ? opts.waveAmp : 0.03;
+          const waveFreq = opts.waveFreq || 3.0;
+          const asymSlope = opts.asymSlope || 0.0;
+          const cornerScale = opts.cornerScale !== undefined ? opts.cornerScale : 0.18;
+          const cLow = opts.cLow;
+          const cMid = opts.cMid;
+          const cHigh = opts.cHigh;
+
+          const vertCount = (uSeg + 1) * (vSeg + 1);
+          const positions = new Float32Array(vertCount * 3);
+          const colors = new Float32Array(vertCount * 3);
+          const indices = [];
+          const tmpCol = new THREE.Color();
+
+          let ptr = 0;
+          for (let iu = 0; iu <= uSeg; iu++) {
+            const u = iu / uSeg; // 0 = gathered waist bottom, 1 = flared top rim
+            const rBase = bottomR + (topR - bottomR) * Math.pow(u, 0.88) + flareOut * Math.pow(u, 2.2);
+            const yBase = u * height;
+
+            for (let iv = 0; iv <= vSeg; iv++) {
+              const v = -1.0 + 2.0 * (iv / vSeg);
+              const theta = v * 0.5 * arcAngle;
+              // Diagonal V-fold & corner flare computed internally so waist circle stays upright
+              const cornerLift = Math.pow(Math.abs(v), 1.45) * cornerScale * height * u;
+              const asymShift = asymSlope * v * u;
+              const crinkle = Math.sin(v * Math.PI * waveFreq + u * 2.5) * waveAmp * Math.pow(u, 1.1);
+              const r = rBase + crinkle;
+
+              positions[ptr * 3] = Math.sin(theta) * r;
+              positions[ptr * 3 + 1] = yBase + cornerLift + asymShift + crinkle * 0.30;
+              positions[ptr * 3 + 2] = Math.cos(theta) * r;
+
+              const tCol = clamp(u * 0.85 + Math.abs(v) * 0.15, 0, 1);
+              if (tCol < 0.5) {
+                tmpCol.copy(cLow).lerp(cMid, tCol / 0.5);
+              } else {
+                tmpCol.copy(cMid).lerp(cHigh, (tCol - 0.5) / 0.5);
+              }
+              colors[ptr * 3] = tmpCol.r;
+              colors[ptr * 3 + 1] = tmpCol.g;
+              colors[ptr * 3 + 2] = tmpCol.b;
+              ptr++;
+            }
+          }
+
+          for (let iu = 0; iu < uSeg; iu++) {
+            for (let iv = 0; iv < vSeg; iv++) {
+              const a = iu * (vSeg + 1) + iv;
+              const b = a + 1;
+              const c = a + (vSeg + 1);
+              const d = c + 1;
+              indices.push(a, b, c);
+              indices.push(b, d, c);
+            }
+          }
+
+          const geom = new THREE.BufferGeometry();
+          geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          geom.setIndex(indices);
+          geom.computeVertexNormals();
+          return geom;
+        }
+
+        function createRibbonStrip(curve, width, thickness, refNormal) {
+          const steps = 32;
+          const pts = curve.getPoints(steps);
+          const positions = new Float32Array((steps + 1) * 2 * 3);
+          const colors = new Float32Array((steps + 1) * 2 * 3);
+          const indices = [];
+          const up = new THREE.Vector3(0, 1, 0);
+          const tan = new THREE.Vector3();
+          const side = new THREE.Vector3();
+          const tmpCol = new THREE.Color();
+
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            curve.getTangent(t, tan).normalize();
+            side.crossVectors(tan, refNormal || up);
+            if (side.lengthSq() < 1e-4) side.set(1, 0, 0);
+            side.normalize();
+
+            const halfW = width * (0.5 + 0.18 * Math.sin(t * Math.PI));
+            const p = pts[i];
+            const left = p.clone().addScaledVector(side, -halfW);
+            const right = p.clone().addScaledVector(side, halfW);
+
+            left.z += thickness * Math.sin(t * Math.PI);
+            right.z += thickness * Math.sin(t * Math.PI);
+
+            const idxL = i * 2;
+            const idxR = i * 2 + 1;
+            positions[idxL * 3] = left.x;
+            positions[idxL * 3 + 1] = left.y;
+            positions[idxL * 3 + 2] = left.z;
+            positions[idxR * 3] = right.x;
+            positions[idxR * 3 + 1] = right.y;
+            positions[idxR * 3 + 2] = right.z;
+
+            tmpCol.copy(PALETTE.ribbonLow).lerp(PALETTE.ribbonHigh, 0.35 + 0.65 * Math.sin(t * Math.PI));
+            colors[idxL * 3] = tmpCol.r;
+            colors[idxL * 3 + 1] = tmpCol.g;
+            colors[idxL * 3 + 2] = tmpCol.b;
+            colors[idxR * 3] = tmpCol.r;
+            colors[idxR * 3 + 1] = tmpCol.g;
+            colors[idxR * 3 + 2] = tmpCol.b;
+          }
+
+          for (let i = 0; i < steps; i++) {
+            const a = i * 2;
+            const b = a + 1;
+            const c = a + 2;
+            const d = a + 3;
+            indices.push(a, c, b);
+            indices.push(b, c, d);
+          }
+
+          const geom = new THREE.BufferGeometry();
+          geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+          geom.setIndex(indices);
+          geom.computeVertexNormals();
+          return new THREE.Mesh(geom, ribbonMaterial);
+        }
+
+        function createBouquetWrap() {
+          const wrapGroup = new THREE.Group();
+          const waistY = -1.08;
+
+          // Inner dark-sage botanical cushion so gaps between flowers show lush foliage depth
+          const cushionGeom = new THREE.SphereGeometry(0.84, 18, 12);
+          cushionGeom.scale(1.0, 0.48, 1.0);
+          setLinearGradientColors(cushionGeom, PALETTE.sageBase, PALETTE.sageBase, PALETTE.sageMid, (pos, idx) =>
+            clamp((pos.getY(idx) + 0.42) / 0.84, 0, 1)
+          );
+          const cushionMesh = new THREE.Mesh(cushionGeom, foliageMaterial);
+          cushionMesh.position.set(0, 0.28, 0);
+          wrapGroup.add(cushionMesh);
+
+          // Shell 1: Inner crinkled pearl-white tissue liner (8 staggered sheets, strictly inside Shell 2/3)
+          for (let i = 0; i < 8; i++) {
+            const stagger = i % 2;
+            const sheetGeom = createWrapSheetGeometry({
+              height: 1.62,
+              bottomR: 0.275 + stagger * 0.014,
+              topR: 1.46 + stagger * 0.045,
+              arcAngle: 1.12,
+              flareOut: 0.14,
+              waveAmp: 0.022,
+              waveFreq: 5.0,
+              cornerScale: 0.14,
+              cLow: PALETTE.peonyCreamMid,
+              cMid: PALETTE.tissueWhite,
+              cHigh: PALETTE.tissueWhite,
+            });
+            const sheet = new THREE.Mesh(sheetGeom, wrapMaterial);
+            sheet.position.y = waistY + 0.04;
+            sheet.rotation.y = (i / 8) * Math.PI * 2 + 0.22;
+            wrapGroup.add(sheet);
+          }
+
+          // Shell 2: High back/side Korean sage-green halo sheets (strictly outside Shell 1)
+          const backSpecs = [
+            { ang: Math.PI, h: 2.92, off: 0.22 },
+            { ang: Math.PI - 0.65, h: 2.66, off: 0.16 },
+            { ang: Math.PI + 0.65, h: 2.66, off: 0.16 },
+            { ang: Math.PI - 1.25, h: 2.38, off: 0.10 },
+            { ang: Math.PI + 1.25, h: 2.38, off: 0.10 },
+          ];
+          for (let i = 0; i < backSpecs.length; i++) {
+            const bs = backSpecs[i];
+            const sheetGeom = createWrapSheetGeometry({
+              height: bs.h,
+              bottomR: 0.295 + bs.off * 0.12,
+              topR: 1.74 + bs.off,
+              arcAngle: 1.38,
+              flareOut: 0.34,
+              waveAmp: 0.028,
+              waveFreq: 2.6,
+              cornerScale: 0.16,
+              cLow: PALETTE.wrapDark,
+              cMid: PALETTE.wrapMid,
+              cHigh: PALETTE.wrapLight,
+            });
+            const sheet = new THREE.Mesh(sheetGeom, wrapMaterial);
+            sheet.position.y = waistY;
+            sheet.rotation.y = bs.ang;
+            wrapGroup.add(sheet);
+          }
+
+          // Shell 3: Layered diagonal front V-folds sculpted with asymSlope (waist circle stays upright)
+          const frontLayers = [
+            { y: waistY + 0.02, rotY: 0.24, asym: -0.22, h: 1.54, botR: 0.305, topR: 1.58, arc: 1.55, flare: 0.30 },
+            { y: waistY - 0.02, rotY: -0.26, asym: 0.24, h: 1.38, botR: 0.315, topR: 1.66, arc: 1.64, flare: 0.36 },
+            { y: waistY - 0.05, rotY: 0.04, asym: -0.10, h: 1.22, botR: 0.322, topR: 1.74, arc: 1.76, flare: 0.42 },
+          ];
+          for (let i = 0; i < frontLayers.length; i++) {
+            const fl = frontLayers[i];
+            const sheetGeom = createWrapSheetGeometry({
+              height: fl.h,
+              bottomR: fl.botR,
+              topR: fl.topR,
+              arcAngle: fl.arc,
+              flareOut: fl.flare,
+              waveAmp: 0.026,
+              waveFreq: 2.2,
+              asymSlope: fl.asym,
+              cornerScale: 0.18,
+              cLow: PALETTE.wrapDark,
+              cMid: PALETTE.wrapMid,
+              cHigh: PALETTE.wrapLight,
+            });
+            const sheet = new THREE.Mesh(sheetGeom, wrapMaterial);
+            sheet.position.y = fl.y;
+            sheet.rotation.y = fl.rotY;
+            wrapGroup.add(sheet);
+          }
+
+          // Shell 4: Lower pleated sage-green paper skirt + recessed interior bottom cap
+          const skirtGeom = new THREE.CylinderGeometry(0.275, 0.50, 1.04, 36, 10, true);
+          const sPos = skirtGeom.attributes.position;
+          for (let i = 0; i < sPos.count; i++) {
+            const px = sPos.getX(i);
+            const py = sPos.getY(i);
+            const pz = sPos.getZ(i);
+            const ang = Math.atan2(pz, px);
+            const tDown = clamp((0.52 - py) / 1.04, 0, 1);
+            const pleat = 1.0 + 0.07 * Math.sin(ang * 9.0) * tDown;
+            sPos.setX(i, px * pleat);
+            sPos.setZ(i, pz * pleat);
+          }
+          skirtGeom.computeVertexNormals();
+          setLinearGradientColors(
+            skirtGeom,
+            PALETTE.wrapMid,
+            PALETTE.wrapDark,
+            PALETTE.wrapLight,
+            (pos, idx) => clamp((pos.getY(idx) + 0.52) / 1.04, 0, 1)
+          );
+          const skirtMesh = new THREE.Mesh(skirtGeom, wrapMaterial);
+          skirtMesh.position.y = waistY - 0.52;
+          wrapGroup.add(skirtMesh);
+
+          const bottomCapGeom = new THREE.CircleGeometry(0.42, 24);
+          setLinearGradientColors(bottomCapGeom, PALETTE.sageBase, PALETTE.wrapDark, PALETTE.wrapDark, () => 0.5);
+          const bottomCap = new THREE.Mesh(bottomCapGeom, foliageMaterial);
+          bottomCap.position.y = waistY - 0.92;
+          bottomCap.rotation.x = Math.PI / 2;
+          wrapGroup.add(bottomCap);
+
+          // Shell 5: Satin baby-pink ribbon waist wrap + bow + swaying tails (strictly outside skirt)
+          const bandGeom = new THREE.CylinderGeometry(0.335, 0.345, 0.21, 32, 4, true);
+          setLinearGradientColors(bandGeom, PALETTE.ribbonLow, PALETTE.ribbonHigh, PALETTE.ribbonHigh, (pos, idx) =>
+            1.0 - Math.abs(pos.getY(idx) / 0.105)
+          );
+          const bandMesh = new THREE.Mesh(bandGeom, ribbonMaterial);
+          bandMesh.position.y = waistY;
+          wrapGroup.add(bandMesh);
+
+          const tailPivots = [];
+          for (const sideSign of [-1, 1]) {
+            const loopCurve = new THREE.CatmullRomCurve3(
+              [
+                new THREE.Vector3(0, waistY, 0.35),
+                new THREE.Vector3(sideSign * 0.24, waistY + 0.11, 0.48),
+                new THREE.Vector3(sideSign * 0.38, waistY + 0.01, 0.44),
+                new THREE.Vector3(sideSign * 0.22, waistY - 0.10, 0.41),
+                new THREE.Vector3(0, waistY - 0.01, 0.35),
+              ],
+              true
+            );
+            wrapGroup.add(createRibbonStrip(loopCurve, 0.11, 0.015));
+
+            const tailPivot = new THREE.Group();
+            tailPivot.position.set(sideSign * 0.05, waistY - 0.03, 0.365);
+            const tailCurve = new THREE.CatmullRomCurve3([
+              new THREE.Vector3(0, 0, 0),
+              new THREE.Vector3(sideSign * 0.14, -0.36, 0.16),
+              new THREE.Vector3(sideSign * 0.25, -0.78, 0.29),
+              new THREE.Vector3(sideSign * 0.32, -1.16, 0.37),
+            ]);
+            tailPivot.add(createRibbonStrip(tailCurve, 0.095, 0.01, new THREE.Vector3(0, 0, 1)));
+            wrapGroup.add(tailPivot);
+            tailPivots.push({ pivot: tailPivot, side: sideSign });
+          }
+
+          const knotGeom = new THREE.SphereGeometry(0.075, 12, 10);
+          knotGeom.scale(1.15, 0.85, 0.78);
+          setLinearGradientColors(knotGeom, PALETTE.ribbonLow, PALETTE.ribbonHigh, PALETTE.ribbonPearl, () => 0.7);
+          const knotMesh = new THREE.Mesh(knotGeom, ribbonMaterial);
+          knotMesh.position.set(0, waistY, 0.365);
+          wrapGroup.add(knotMesh);
+
+          return { wrapGroup: wrapGroup, tailPivots: tailPivots };
+        }
+
+        // -------------------------------------------------------------------
+        // Arched Florist Greeting Card (createFloristCard)
+        // -------------------------------------------------------------------
+        function createFloristCard() {
+          const cardGroup = new THREE.Group();
+          const w = 0.56;
+          const rectH = 0.54;
+          const archR = w * 0.5;
+          const totalH = rectH + archR;
+
+          const shape = new THREE.Shape();
+          shape.moveTo(-w / 2, 0);
+          shape.lineTo(w / 2, 0);
+          shape.lineTo(w / 2, rectH);
+          shape.absarc(0, rectH, archR, 0, Math.PI, false);
+          shape.lineTo(-w / 2, 0);
+
+          const frontGeom = new THREE.ShapeGeometry(shape, 24);
+          const pos = frontGeom.attributes.position;
+          const uv = new Float32Array(pos.count * 2);
+          for (let i = 0; i < pos.count; i++) {
+            uv[i * 2] = (pos.getX(i) + w / 2) / w;
+            uv[i * 2 + 1] = pos.getY(i) / totalH;
+          }
+          frontGeom.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+
+          const frontMesh = new THREE.Mesh(frontGeom, cardFrontMaterial);
+          frontMesh.position.z = 0.004;
+          cardGroup.add(frontMesh);
+
+          // Warm pearl-cream cardstock backing (separate cardBackMaterial, never sage wrapMaterial)
+          const backGeom = frontGeom.clone();
+          setLinearGradientColors(backGeom, PALETTE.peonyCreamMid, PALETTE.tissueWhite, PALETTE.peonyCreamTip, (p, i) =>
+            clamp(p.getY(i) / totalH, 0, 1)
+          );
+          const backMesh = new THREE.Mesh(backGeom, cardBackMaterial);
+          backMesh.position.z = -0.004;
+          backMesh.rotation.y = Math.PI;
+          cardGroup.add(backMesh);
+
+          const stickGeom = new THREE.CylinderGeometry(0.012, 0.012, 0.62, 6);
+          setLinearGradientColors(stickGeom, PALETTE.stemBase, PALETTE.stemTip, PALETTE.sageTip, () => 0.5);
+          const stickMesh = new THREE.Mesh(stickGeom, foliageMaterial);
+          stickMesh.position.set(0, -0.30, -0.006);
+          cardGroup.add(stickMesh);
+
+          return cardGroup;
+        }
+
+        // -------------------------------------------------------------------
+        // Assemble Full Reference-Inspired Bouquet inside bouquetRoot
+        // -------------------------------------------------------------------
+        const rng = mulberry32(20260429);
+        const bouquetRoot = new THREE.Group();
+        scene.add(bouquetRoot);
+        const upAxis = new THREE.Vector3(0, 1, 0);
+        const swayNodes = [];
+
+        function registerSway(obj, ampX, ampZ, speed) {
+          swayNodes.push({
+            obj: obj,
+            baseQuat: obj.quaternion.clone(),
+            phase: rng() * Math.PI * 2,
+            ampX: ampX,
+            ampZ: ampZ,
+            speed: speed,
+          });
+        }
+
+        function addFlowerStem(fromPos, dirVec) {
+          const d = dirVec.clone().normalize();
+          const start = fromPos.clone().addScaledVector(d, -0.04);
+          const end = new THREE.Vector3(fromPos.x * 0.22, -0.35, fromPos.z * 0.22);
+          const mid = start.clone().lerp(end, 0.5);
+          mid.x *= 0.85;
+          mid.z *= 0.85;
+          const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+          const stemGeom = new THREE.TubeGeometry(curve, 12, 0.024, 6, false);
+          setLinearGradientColors(stemGeom, PALETTE.stemBase, PALETTE.stemBase, PALETTE.stemTip, (pos, idx) =>
+            clamp((pos.getY(idx) + 0.35) / 2.2, 0, 1)
+          );
+          bouquetRoot.add(new THREE.Mesh(stemGeom, foliageMaterial));
+        }
+
+        function placeOriented(obj, pos, dirVec, withStem) {
+          obj.position.copy(pos);
+          const d = dirVec.clone().normalize();
+          obj.quaternion.setFromUnitVectors(upAxis, d);
+          bouquetRoot.add(obj);
+          if (withStem) addFlowerStem(pos, d);
+          registerSway(obj, 0.016, 0.016, 1.15 + rng() * 0.45);
+        }
+
+        // 1. 6 Well-Separated Globular Peonies (strictly above wrap rim, zero merged cores)
+        const peonySpecs = [
+          { pos: new THREE.Vector3(0.05, 0.58, 0.72), dir: new THREE.Vector3(0.04, 0.56, 0.83), scale: 0.86, style: "baby_pink" },
+          { pos: new THREE.Vector3(-0.56, 0.76, 0.52), dir: new THREE.Vector3(-0.42, 0.62, 0.66), scale: 0.78, style: "baby_pink" },
+          { pos: new THREE.Vector3(0.18, 1.12, 0.42), dir: new THREE.Vector3(0.12, 0.78, 0.61), scale: 0.82, style: "cream_blush" },
+          { pos: new THREE.Vector3(-0.18, 1.46, -0.08), dir: new THREE.Vector3(-0.08, 0.96, 0.24), scale: 0.84, style: "baby_pink" },
+          { pos: new THREE.Vector3(0.58, 0.84, -0.48), dir: new THREE.Vector3(0.52, 0.66, -0.54), scale: 0.80, style: "baby_pink" },
+          { pos: new THREE.Vector3(-0.52, 0.90, -0.56), dir: new THREE.Vector3(-0.46, 0.68, -0.56), scale: 0.80, style: "cream_blush" },
+        ];
+        for (let i = 0; i < peonySpecs.length; i++) {
+          const sp = peonySpecs[i];
+          placeOriented(createGlobularPeony(sp.style, sp.scale, rng), sp.pos, sp.dir, true);
+        }
+
+        // 2. 5 Open Oriental Lilies + 3 Closed Lily Buds (flaring cleanly above wrap rim)
+        const lilySpecs = [
+          { pos: new THREE.Vector3(-0.82, 1.10, 0.42), dir: new THREE.Vector3(-0.62, 0.54, 0.57), scale: 0.96 },
+          { pos: new THREE.Vector3(0.84, 1.00, 0.36), dir: new THREE.Vector3(0.72, 0.54, 0.44), scale: 0.92 },
+          { pos: new THREE.Vector3(-0.84, 1.56, -0.14), dir: new THREE.Vector3(-0.62, 0.74, 0.24), scale: 0.86 },
+          { pos: new THREE.Vector3(0.80, 1.46, -0.34), dir: new THREE.Vector3(0.64, 0.72, -0.26), scale: 0.84 },
+          { pos: new THREE.Vector3(0.00, 1.34, -0.78), dir: new THREE.Vector3(0.00, 0.68, -0.73), scale: 0.88 },
+        ];
+        for (let i = 0; i < lilySpecs.length; i++) {
+          const sp = lilySpecs[i];
+          placeOriented(createOrientalLily(sp.scale, rng), sp.pos, sp.dir, true);
+        }
+
+        const budSpecs = [
+          { pos: new THREE.Vector3(-1.02, 1.74, -0.02), dir: new THREE.Vector3(-0.48, 0.85, 0.20), scale: 0.88 },
+          { pos: new THREE.Vector3(-0.76, 1.86, 0.14), dir: new THREE.Vector3(-0.30, 0.92, 0.24), scale: 0.80 },
+          { pos: new THREE.Vector3(-0.56, 1.78, -0.36), dir: new THREE.Vector3(-0.34, 0.88, -0.32), scale: 0.82 },
+        ];
+        for (let i = 0; i < budSpecs.length; i++) {
+          const sp = budSpecs[i];
+          placeOriented(createLilyBud(sp.scale), sp.pos, sp.dir, true);
+        }
+
+        // 3. 6 Sleek Creamy-White Tulips nestled in open pockets with stems
+        const tulipSpecs = [
+          { pos: new THREE.Vector3(0.20, 1.62, 0.10), dir: new THREE.Vector3(0.12, 0.96, 0.24), scale: 0.96 },
+          { pos: new THREE.Vector3(0.58, 0.78, 0.58), dir: new THREE.Vector3(0.44, 0.64, 0.63), scale: 0.92 },
+          { pos: new THREE.Vector3(-0.46, 1.48, 0.38), dir: new THREE.Vector3(-0.30, 0.86, 0.40), scale: 0.88 },
+          { pos: new THREE.Vector3(0.54, 1.24, 0.28), dir: new THREE.Vector3(0.42, 0.82, 0.38), scale: 0.88 },
+          { pos: new THREE.Vector3(-0.46, 1.34, -0.62), dir: new THREE.Vector3(-0.36, 0.82, -0.45), scale: 0.90 },
+          { pos: new THREE.Vector3(0.34, 1.30, -0.70), dir: new THREE.Vector3(0.26, 0.80, -0.54), scale: 0.88 },
+        ];
+        for (let i = 0; i < tulipSpecs.length; i++) {
+          const sp = tulipSpecs[i];
+          placeOriented(createTulip(sp.scale, rng), sp.pos, sp.dir, true);
+        }
+
+        // 4. 10 Airy Filler Clusters in open pockets (y in [0.74, 1.54], r <= 0.95)
+        const fillerSpecs = [
+          { pos: new THREE.Vector3(0.44, 1.38, 0.08), dir: new THREE.Vector3(0.22, 0.94, 0.22), spire: true },
+          { pos: new THREE.Vector3(-0.26, 1.54, -0.22), dir: new THREE.Vector3(-0.14, 0.96, -0.20), spire: true },
+          { pos: new THREE.Vector3(0.50, 0.74, 0.42), dir: new THREE.Vector3(0.42, 0.64, 0.64), spire: false },
+          { pos: new THREE.Vector3(-0.62, 0.76, 0.36), dir: new THREE.Vector3(-0.56, 0.62, 0.54), spire: false },
+          { pos: new THREE.Vector3(-0.16, 0.88, 0.72), dir: new THREE.Vector3(-0.12, 0.66, 0.74), spire: false },
+          { pos: new THREE.Vector3(0.42, 0.96, 0.48), dir: new THREE.Vector3(0.34, 0.74, 0.58), spire: true },
+          { pos: new THREE.Vector3(-0.46, 1.10, 0.36), dir: new THREE.Vector3(-0.38, 0.80, 0.46), spire: false },
+          { pos: new THREE.Vector3(0.16, 1.34, -0.44), dir: new THREE.Vector3(0.14, 0.88, -0.44), spire: true },
+          { pos: new THREE.Vector3(-0.66, 0.84, -0.34), dir: new THREE.Vector3(-0.62, 0.66, -0.42), spire: false },
+          { pos: new THREE.Vector3(0.68, 0.84, -0.26), dir: new THREE.Vector3(0.66, 0.66, -0.34), spire: false },
+        ];
+        for (let i = 0; i < fillerSpecs.length; i++) {
+          const sp = fillerSpecs[i];
+          placeOriented(createFillerCluster(rng, sp.spire), sp.pos, sp.dir, false);
+        }
+
+        // 5. 14 Pointed Sage Green Leaves (angled upward inside floral collar — ZERO wrap penetration)
+        for (let i = 0; i < 14; i++) {
+          const angle = (i / 14) * Math.PI * 2 + 0.18;
+          const isUpper = i % 2 === 0;
+          const rad = isUpper ? 0.56 + (i % 3) * 0.04 : 0.64 + (i % 3) * 0.04;
+          const baseY = isUpper ? 0.98 + (i % 3) * 0.08 : 0.74 + (i % 3) * 0.06;
+          const len = isUpper ? 0.48 + rng() * 0.10 : 0.50 + rng() * 0.10;
+          const wid = len * 0.34;
+          const leaf = createLeafMesh(len, wid, 0.12);
+          leaf.rotation.order = "YXZ";
+          leaf.position.set(Math.cos(angle) * rad, baseY, Math.sin(angle) * rad);
+          leaf.rotation.y = Math.atan2(Math.cos(angle), Math.sin(angle));
+          leaf.rotation.x = isUpper ? -0.92 : -0.76; // Negative X in YXZ pitches leaf upward above wrap rim
+          leaf.rotation.z = (rng() - 0.5) * 0.18;
+          bouquetRoot.add(leaf);
+          registerSway(leaf, 0.024, 0.018, 1.35 + rng() * 0.45);
+        }
+
+        // 6. Korean Multi-Layered Sage Wrap & Swaying Baby-Pink Ribbon Tails
+        const wrapResult = createBouquetWrap();
+        bouquetRoot.add(wrapResult.wrapGroup);
+        const tailPivots = wrapResult.tailPivots;
+
+        // 7. Arched Florist Greeting Card tucked cleanly into upper-right
+        const floristCard = createFloristCard();
+        floristCard.position.set(0.46, 1.64, -0.32);
+        floristCard.rotation.order = "YXZ";
+        floristCard.rotation.y = -0.16;
+        floristCard.rotation.z = -0.09;
+        floristCard.rotation.x = -0.04;
+        bouquetRoot.add(floristCard);
+        registerSway(floristCard, 0.014, 0.012, 0.95);
+
+        // Tag EVERY mesh inside bouquetRoot with world-space aWavePos from bouquet heart
+        const BOUQUET_HEART = new THREE.Vector3(0.0, 0.95, 0.0);
+        bouquetRoot.updateMatrixWorld(true);
+        bouquetRoot.traverse((obj) => {
+          if (obj.isMesh && obj.geometry) {
+            const geom = obj.geometry;
+            const posAttr = geom.attributes.position;
+            const count = posAttr.count;
+            const waveArr = new Float32Array(count);
+            const vWorld = new THREE.Vector3();
+            for (let i = 0; i < count; i++) {
+              vWorld.fromBufferAttribute(posAttr, i).applyMatrix4(obj.matrixWorld);
+              const dist = vWorld.distanceTo(BOUQUET_HEART);
+              const downBias = Math.max(0, BOUQUET_HEART.y - vWorld.y) * 0.14;
+              waveArr[i] = clamp((dist + downBias) / 4.25, 0.0, 1.0);
+            }
+            geom.setAttribute("aWavePos", new THREE.BufferAttribute(waveArr, 1));
+          }
+        });
+
+        // -------------------------------------------------------------------
+        // Soft Dreamy Aura Behind Bouquet
+        // -------------------------------------------------------------------
+        function createAuraTexture() {
+          const size = 256;
+          const c = document.createElement("canvas");
+          c.width = size;
+          c.height = size;
+          const ctx = c.getContext("2d");
+          const grad = ctx.createRadialGradient(size / 2, size / 2, 4, size / 2, size / 2, size / 2);
+          grad.addColorStop(0.0, "rgba(255, 224, 240, 0.42)");
+          grad.addColorStop(0.35, "rgba(255, 194, 224, 0.18)");
+          grad.addColorStop(0.7, "rgba(184, 168, 210, 0.06)");
+          grad.addColorStop(1.0, "rgba(0, 0, 0, 0)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, size, size);
+          return new THREE.CanvasTexture(c);
+        }
+
+        const auraMat = new THREE.SpriteMaterial({
+          map: createAuraTexture(),
+          color: srgbColor("#D8E0F0"),
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const auraSprite = new THREE.Sprite(auraMat);
+        auraSprite.position.set(0, 0.42, -2.0);
+        auraSprite.scale.set(8.2, 8.2, 1);
+        scene.add(auraSprite);
+
+        // -------------------------------------------------------------------
+        // 3D Twinkling Starfield (Custom ShaderMaterial Points)
+        // -------------------------------------------------------------------
+        const starCount = 560;
+        const starPositions = new Float32Array(starCount * 3);
+        const starSizes = new Float32Array(starCount);
+        const starPhases = new Float32Array(starCount);
+        const starSpeeds = new Float32Array(starCount);
+        const starTints = new Float32Array(starCount);
+
+        const starRng = mulberry32(88421);
+        for (let i = 0; i < starCount; i++) {
+          const u = starRng();
+          const v = starRng();
+          const theta = u * Math.PI * 2;
+          const phi = Math.acos(2 * v - 1);
+          const radius = 22 + starRng() * 26;
+
+          starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+          starPositions[i * 3 + 1] = radius * Math.cos(phi);
+          starPositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+          const isBright = starRng() > 0.84;
+          starSizes[i] = isBright ? 14.0 + starRng() * 14.0 : 4.5 + starRng() * 6.5;
+          starPhases[i] = starRng() * Math.PI * 2;
+          starSpeeds[i] = 1.1 + starRng() * 2.4;
+          starTints[i] = starRng();
+        }
+
+        const starGeom = new THREE.BufferGeometry();
+        starGeom.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+        starGeom.setAttribute("aSize", new THREE.BufferAttribute(starSizes, 1));
+        starGeom.setAttribute("aPhase", new THREE.BufferAttribute(starPhases, 1));
+        starGeom.setAttribute("aSpeed", new THREE.BufferAttribute(starSpeeds, 1));
+        starGeom.setAttribute("aTint", new THREE.BufferAttribute(starTints, 1));
+
+        const starUniforms = {
+          uTime: { value: 0 },
+          uPixelRatio: { value: renderer.getPixelRatio() },
+          uColorMix: { value: 0 },
+        };
+
+        const starMat = new THREE.ShaderMaterial({
+          uniforms: starUniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: `
+            attribute float aSize;
+            attribute float aPhase;
+            attribute float aSpeed;
+            attribute float aTint;
+            uniform float uTime;
+            uniform float uPixelRatio;
+            varying float vTwinkle;
+            varying float vTint;
+            varying float vSize;
+
+            void main() {
+              vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+              float tw = 0.52 + 0.48 * sin(uTime * aSpeed + aPhase);
+              vTwinkle = tw;
+              vTint = aTint;
+              vSize = aSize;
+              gl_PointSize = aSize * (0.72 + 0.45 * tw) * uPixelRatio * (26.0 / max(1.0, -mvPos.z));
+              gl_Position = projectionMatrix * mvPos;
+            }
+          `,
+          fragmentShader: `
+            uniform float uColorMix;
+            varying float vTwinkle;
+            varying float vTint;
+            varying float vSize;
+
+            void main() {
+              vec2 uv = gl_PointCoord - vec2(0.5);
+              float d = length(uv) * 2.0;
+              if (d > 1.0) discard;
+
+              float core = exp(-d * d * 7.5);
+              float spikeWeight = smoothstep(10.0, 22.0, vSize);
+              float spikes = (exp(-abs(uv.x) * 26.0) * exp(-abs(uv.y) * 5.0)
+                            + exp(-abs(uv.y) * 26.0) * exp(-abs(uv.x) * 5.0)) * spikeWeight * 0.72;
+              float alpha = clamp((core + spikes) * (0.35 + 0.65 * vTwinkle), 0.0, 1.0);
+
+              vec3 bwCol = vec3(0.86, 0.89, 0.96);
+              vec3 moonBlue = vec3(0.76, 0.86, 1.0);
+              vec3 starPink = vec3(1.0, 0.84, 0.92);
+              vec3 nightCol = mix(moonBlue, starPink, smoothstep(0.55, 0.95, vTint));
+              vec3 col = mix(bwCol, nightCol, uColorMix);
+
+              gl_FragColor = vec4(col, alpha);
+            }
+          `,
+        });
+
+        const starField = new THREE.Points(starGeom, starMat);
+        scene.add(starField);
+
+        // Occasional subtle shooting star in upper sky
+        const shootGeom = new THREE.PlaneGeometry(2.6, 0.032);
+        const shootMat = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+        const shootingStar = new THREE.Mesh(shootGeom, shootMat);
+        shootingStar.position.set(0, 5, -18);
+        shootingStar.rotation.z = -0.36;
+        scene.add(shootingStar);
+
+        // -------------------------------------------------------------------
+        // 3D Floating Baby-Pink Petals & Rising Sparkles
+        // -------------------------------------------------------------------
+        const floatingPetals = [];
+        const floatRng = mulberry32(51209);
+
+        const floatPetalGeomBaby = createPetalGeometry({
+          uSeg: 6,
+          vSeg: 5,
+          length: 0.22,
+          width: 0.17,
+          tiltRad: THREE.MathUtils.degToRad(72),
+          cupDepth: 0.04,
+          ruffleAmp: 0.012,
+          ruffleFreq: 2.0,
+          rufflePhase: 0.5,
+          lipCurl: 0.03,
+          baseRadius: 0.0,
+          cBase: PALETTE.peonyShadow,
+          cMid: PALETTE.peonyBaby,
+          cTip: PALETTE.peonyTip,
+        });
+        {
+          const n = floatPetalGeomBaby.attributes.position.count;
+          floatPetalGeomBaby.setAttribute("aWavePos", new THREE.BufferAttribute(new Float32Array(n).fill(0.35), 1));
+        }
+
+        const floatPetalGeomWhite = createPetalGeometry({
+          uSeg: 6,
+          vSeg: 5,
+          length: 0.20,
+          width: 0.16,
+          tiltRad: THREE.MathUtils.degToRad(72),
+          cupDepth: 0.035,
+          ruffleAmp: 0.01,
+          ruffleFreq: 2.0,
+          rufflePhase: 1.2,
+          lipCurl: 0.025,
+          baseRadius: 0.0,
+          cBase: PALETTE.peonyCreamMid,
+          cMid: PALETTE.tissueWhite,
+          cTip: PALETTE.peonyCreamTip,
+        });
+        {
+          const n = floatPetalGeomWhite.attributes.position.count;
+          floatPetalGeomWhite.setAttribute("aWavePos", new THREE.BufferAttribute(new Float32Array(n).fill(0.35), 1));
+        }
+
+        for (let i = 0; i < 42; i++) {
+          const isWhite = i % 3 === 0;
+          const mesh = new THREE.Mesh(
+            isWhite ? floatPetalGeomWhite : floatPetalGeomBaby,
+            floatingPetalMaterial
+          );
+          const baseScale = 0.65 + floatRng() * 0.55;
+          mesh.scale.setScalar(baseScale);
+          scene.add(mesh);
+          floatingPetals.push({
+            mesh: mesh,
+            baseScale: baseScale,
+            radius: 2.38 + floatRng() * 1.55,
+            baseY: -2.3 + floatRng() * 5.0,
+            angle0: floatRng() * Math.PI * 2,
+            orbitSpeed: (0.14 + floatRng() * 0.22) * (i % 2 === 0 ? 1 : -1),
+            fallSpeed: 0.22 + floatRng() * 0.22,
+            swayPhase: floatRng() * Math.PI * 2,
+            spinX: (floatRng() - 0.5) * 1.2,
+            spinY: (floatRng() - 0.5) * 1.4,
+            spinZ: (floatRng() - 0.5) * 1.0,
+          });
+        }
+
+        const sparkleCount = 85;
+        const spPos = new Float32Array(sparkleCount * 3);
+        const spPhase = new Float32Array(sparkleCount);
+        const spSpeed = new Float32Array(sparkleCount);
+        const spRadius = new Float32Array(sparkleCount);
+        const spAngle0 = new Float32Array(sparkleCount);
+        const spBaseY = new Float32Array(sparkleCount);
+        const spSize = new Float32Array(sparkleCount);
+
+        for (let i = 0; i < sparkleCount; i++) {
+          spRadius[i] = 2.25 + floatRng() * 1.65;
+          spAngle0[i] = floatRng() * Math.PI * 2;
+          spBaseY[i] = -2.2 + floatRng() * 4.7;
+          spPhase[i] = floatRng() * Math.PI * 2;
+          spSpeed[i] = 0.16 + floatRng() * 0.24;
+          spSize[i] = 8.0 + floatRng() * 12.0;
+        }
+
+        const spGeom = new THREE.BufferGeometry();
+        spGeom.setAttribute("position", new THREE.BufferAttribute(spPos, 3));
+        spGeom.setAttribute("aPhase", new THREE.BufferAttribute(spPhase, 1));
+        spGeom.setAttribute("aSize", new THREE.BufferAttribute(spSize, 1));
+
+        const spUniforms = {
+          uTime: { value: 0 },
+          uAlpha: { value: 0 },
+          uPixelRatio: { value: renderer.getPixelRatio() },
+        };
+
+        const spMat = new THREE.ShaderMaterial({
+          uniforms: spUniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: `
+            attribute float aPhase;
+            attribute float aSize;
+            uniform float uTime;
+            uniform float uPixelRatio;
+            varying float vPulse;
+
+            void main() {
+              vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+              vPulse = 0.45 + 0.55 * sin(uTime * 2.8 + aPhase);
+              gl_PointSize = aSize * (0.7 + 0.5 * vPulse) * uPixelRatio * (8.5 / max(1.0, -mvPos.z));
+              gl_Position = projectionMatrix * mvPos;
+            }
+          `,
+          fragmentShader: `
+            uniform float uAlpha;
+            varying float vPulse;
+
+            void main() {
+              vec2 uv = gl_PointCoord - vec2(0.5);
+              float d = length(uv) * 2.0;
+              if (d > 1.0) discard;
+              float glow = exp(-d * d * 5.2);
+              vec3 col = mix(vec3(1.0, 0.78, 0.89), vec3(1.0, 0.97, 0.99), glow);
+              gl_FragColor = vec4(col, glow * vPulse * uAlpha);
+            }
+          `,
+        });
+
+        const sparklePoints = new THREE.Points(spGeom, spMat);
+        scene.add(sparklePoints);
+
+        // -------------------------------------------------------------------
+        // Interactive Orbit / Zoom Controls with Smooth Damping & Auto-Spin
+        // -------------------------------------------------------------------
+        let userDragging = false;
+        let lastPointerX = 0;
+        let lastPointerY = 0;
+        let yawOffset = 0;
+        let yawVel = 0;
+        let pitchTarget = 0.14;
+        let pitchVel = 0;
+        let dragTiltZ = 0;
+        let dragTiltX = 0;
+        let camDist = 8.5;
+        let camDistTarget = 8.5;
+
+        const dragHint = document.getElementById("drag-hint");
+        let hintHidden = false;
+        function hideHintSoon() {
+          if (!hintHidden && dragHint) {
+            hintHidden = true;
+            dragHint.style.opacity = "0";
+          }
+        }
+        setTimeout(hideHintSoon, 7000);
+
+        canvas.addEventListener("pointerdown", function (e) {
+          userDragging = true;
+          lastPointerX = e.clientX;
+          lastPointerY = e.clientY;
+          hideHintSoon();
+        });
+
+        window.addEventListener("pointermove", function (e) {
+          if (!userDragging) return;
+          const dx = e.clientX - lastPointerX;
+          const dy = e.clientY - lastPointerY;
+          lastPointerX = e.clientX;
+          lastPointerY = e.clientY;
+          yawVel = dx * 0.0055;
+          pitchVel = dy * 0.004;
+          yawOffset += yawVel;
+          pitchTarget = clamp(pitchTarget + pitchVel, -0.38, 0.70);
+        });
+
+        window.addEventListener("pointerup", function () {
+          userDragging = false;
+        });
+
+        canvas.addEventListener(
+          "wheel",
+          function (e) {
+            e.preventDefault();
+            camDistTarget = clamp(camDistTarget + e.deltaY * 0.0045, 5.8, 12.2);
+          },
+          { passive: false }
+        );
+
+        function updateCameraProjection() {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          const aspect = w / Math.max(1, h);
+          camera.aspect = aspect;
+          camera.updateProjectionMatrix();
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setSize(w, h);
+          starUniforms.uPixelRatio.value = renderer.getPixelRatio();
+          spUniforms.uPixelRatio.value = renderer.getPixelRatio();
+          if (!userDragging && camDistTarget === 8.5 && aspect < 0.85) {
+            camDistTarget = 10.6;
+          }
+        }
+        window.addEventListener("resize", updateCameraProjection);
+        if (window.innerWidth / Math.max(1, window.innerHeight) < 0.85) {
+          camDist = 10.6;
+          camDistTarget = 10.6;
+        }
+
+        // -------------------------------------------------------------------
+        // Timeline & Caption Elements + Query Override (?t=seconds)
+        // -------------------------------------------------------------------
+        const line1El = document.getElementById("line1");
+        const line2El = document.getElementById("line2");
+        const dedicationEl = document.getElementById("dedication");
+        const skyColorGlowEl = document.getElementById("sky-color-glow");
+        const replayBtn = document.getElementById("replay-btn");
+
+        const params = new URLSearchParams(window.location.search);
+        const tQuery = params.get("t");
+        let isFrozen = tQuery !== null && !Number.isNaN(parseFloat(tQuery));
+        let elapsed = isFrozen ? Math.max(0, parseFloat(tQuery)) : 0;
+        let prevPerf = performance.now();
+
+        replayBtn.addEventListener("click", function () {
+          isFrozen = false;
+          elapsed = 0;
+          prevPerf = performance.now();
+        });
+
+        function updateShootingStar(t) {
+          if (t < 6.2) {
+            shootMat.opacity = 0;
+            return;
+          }
+          const period = 7.5;
+          const local = (t - 6.2) % period;
+          if (local < 1.15) {
+            const p = local / 1.15;
+            const cycleIdx = Math.floor((t - 6.2) / period);
+            const sign = cycleIdx % 2 === 0 ? 1 : -1;
+            shootingStar.position.set(sign * (-6.5 + p * 13.0), 4.6 - p * 2.5, -18);
+            shootingStar.rotation.z = sign * -0.32;
+            shootMat.opacity = Math.sin(p * Math.PI) * 0.72;
+          } else {
+            shootMat.opacity = 0;
+          }
+        }
+
+        // -------------------------------------------------------------------
+        // Main Render Loop (60 FPS)
+        // -------------------------------------------------------------------
+        const bwAuraColor = srgbColor("#C8D4EA");
+        const pinkAuraColor = srgbColor("#FFC6E0");
+        const tmpAuraColor = new THREE.Color();
+        const swayEuler = new THREE.Euler(0, 0, 0, "XYZ");
+        const swayQuat = new THREE.Quaternion();
+
+        function animate(now) {
+          requestAnimationFrame(animate);
+
+          const dt = Math.min(0.05, (now - prevPerf) / 1000);
+          prevPerf = now;
+          if (!isFrozen) {
+            elapsed += dt;
+          }
+          const t = elapsed;
+
+          let waveFront;
+          if (t < 5.2) {
+            waveFront = -0.35;
+          } else {
+            const prog = clamp((t - 5.2) / 5.0, 0, 1);
+            waveFront = -0.25 + prog * 1.70;
+          }
+          bloomUniforms.uBloomFront.value = waveFront;
+          bloomUniforms.uCrestGlow.value = 1.0 - smoothstep(9.5, 11.2, t);
+
+          const skyMix = smoothstep(5.2, 9.6, t);
+          starUniforms.uTime.value = t;
+          starUniforms.uColorMix.value = skyMix;
+          skyColorGlowEl.style.opacity = skyMix.toFixed(3);
+
+          tmpAuraColor.copy(bwAuraColor).lerp(pinkAuraColor, skyMix);
+          auraMat.color.copy(tmpAuraColor);
+          auraMat.opacity = 0.20 + 0.24 * skyMix;
+
+          const particleVis = smoothstep(5.2, 8.5, t);
+          floatingPetalMaterial.opacity = particleVis * 0.90;
+          spUniforms.uTime.value = t;
+          spUniforms.uAlpha.value = particleVis * 0.88;
+
+          for (let i = 0; i < floatingPetals.length; i++) {
+            const p = floatingPetals[i];
+            const ang = p.angle0 + t * p.orbitSpeed;
+            const ySpan = 5.0;
+            const yFrac = ((2.7 - p.baseY + t * p.fallSpeed) % ySpan) / ySpan;
+            const py = 2.7 - yFrac * ySpan;
+            const sway = 0.16 * Math.sin(t * 1.3 + p.swayPhase);
+            const flutter = Math.cos(t * 1.3 + p.swayPhase) * 0.55;
+            const r = p.radius + sway;
+            p.mesh.position.set(r * Math.cos(ang), py, r * Math.sin(ang));
+            p.mesh.rotation.set(
+              t * p.spinX + p.swayPhase + flutter * 0.45,
+              t * p.spinY,
+              t * p.spinZ + flutter
+            );
+            const env = smoothstep(0.0, 0.12, yFrac) * (1.0 - smoothstep(0.88, 1.0, yFrac));
+            p.mesh.scale.setScalar(p.baseScale * env);
+          }
+
+          const spArr = spGeom.attributes.position.array;
+          for (let i = 0; i < sparkleCount; i++) {
+            const ang = spAngle0[i] + t * 0.12 * (i % 2 === 0 ? 1 : -1);
+            const ySpan = 4.7;
+            const py = -2.2 + ((spBaseY[i] + 2.2 + t * spSpeed[i]) % ySpan);
+            const r = spRadius[i];
+            spArr[i * 3] = r * Math.cos(ang);
+            spArr[i * 3 + 1] = py;
+            spArr[i * 3 + 2] = r * Math.sin(ang);
+          }
+          spGeom.attributes.position.needsUpdate = true;
+
+          updateShootingStar(t);
+
+          // Micro-breeze organic sway on flowers, leaves, card, and ribbon tails
+          for (let i = 0; i < swayNodes.length; i++) {
+            const sn = swayNodes[i];
+            const sx = Math.sin(t * sn.speed + sn.phase) * sn.ampX;
+            const sz = Math.cos(t * sn.speed * 0.83 + sn.phase * 1.3) * sn.ampZ;
+            swayEuler.set(sx, 0, sz);
+            swayQuat.setFromEuler(swayEuler);
+            sn.obj.quaternion.copy(sn.baseQuat).multiply(swayQuat);
+          }
+          for (let i = 0; i < tailPivots.length; i++) {
+            const tp = tailPivots[i];
+            tp.pivot.rotation.x = Math.sin(t * 1.45 + tp.side * 0.7) * 0.055;
+            tp.pivot.rotation.z = Math.cos(t * 1.15 + tp.side) * 0.035;
+          }
+
+          // Smooth rotational inertia + drag tilt weight
+          if (!userDragging) {
+            yawOffset += yawVel;
+            yawVel *= 0.92;
+            pitchVel *= 0.88;
+          } else {
+            yawVel *= 0.72;
+            pitchVel *= 0.72;
+          }
+          dragTiltZ += (clamp(-yawVel * 2.4, -0.14, 0.14) - dragTiltZ) * 0.12;
+          dragTiltX += (clamp(pitchVel * 2.2, -0.10, 0.10) - dragTiltX) * 0.12;
+
+          const autoYaw = -0.25 + t * 0.28;
+          bouquetRoot.rotation.y = autoYaw + yawOffset;
+          bouquetRoot.rotation.z = dragTiltZ;
+          bouquetRoot.rotation.x = dragTiltX;
+          bouquetRoot.position.y = Math.sin(t * 0.72) * 0.05;
+
+          camDist += (camDistTarget - camDist) * 0.09;
+          const camY = 0.30 + Math.sin(pitchTarget) * camDist * 0.60;
+          const camZ = Math.cos(pitchTarget) * camDist;
+          camera.position.set(0, camY, camZ);
+          camera.lookAt(0, -0.15, 0);
+
+          starField.rotation.y = t * 0.014 + yawOffset * 0.15;
+
+          const op1 = smoothstep(0.6, 2.2, t);
+          line1El.style.opacity = op1.toFixed(3);
+          line1El.style.transform = `translateY(${(1 - op1) * 8}px)`;
+
+          const op2 = smoothstep(6.0, 7.9, t);
+          line2El.style.opacity = op2.toFixed(3);
+          line2El.style.transform = `translateY(${(1 - op2) * 10}px)`;
+
+          const op3 = smoothstep(7.2, 9.2, t);
+          dedicationEl.style.opacity = op3.toFixed(3);
+          dedicationEl.style.transform = `translateY(${(1 - op3) * 8}px)`;
+
+          renderer.render(scene, camera);
+        }
+
+        requestAnimationFrame(animate);
+      }
+    })();
+  </script>
+</body>
+
+</html>
